@@ -1,0 +1,4 @@
+Linea	KEYWORD1
+calibracion	KEYWORD2
+LineaBlanca	KEYWORD2
+LineaNegra	KEYWORD2

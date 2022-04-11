@@ -1,0 +1,72 @@
+
+#include <VirtualWire.h>
+    int dato1;
+    int dato2;
+void setup()
+{
+  Serial.begin(9600);  // Debugging only
+  Serial.println("Receptor: setup");
+
+    // Se inicializa el RF
+    vw_setup(2000);  // velocidad: Bits per segundo
+    vw_set_rx_pin(2);    //Pin 2 como entrada del RF
+    vw_set_tx_pin(3); //Pin 2 como salida para el RF
+    vw_rx_start();       // Se inicia como receptor
+    
+}
+
+void loop()
+{
+int valorADC;
+valorADC = analogRead(A0);
+    //////////////////////////////////recepcion de datos////////////////////
+    
+    uint8_t buf[VW_MAX_MESSAGE_LEN];
+    uint8_t buflen = VW_MAX_MESSAGE_LEN;
+
+    int rev1,rev2;
+    //verificamos si hay un dato valido en el RF
+    if (vw_get_message((uint8_t *)buf,&buflen))
+    {
+  int i;
+  digitalWrite(led,HIGH);
+  String  DatoCadena="";
+  digitalWrite(rec,HIGH);
+        if((char)buf[0]=='i') //verificamos el inicio de trama
+        {
+            for (i = 1; i < buflen; i++)
+            {
+          DatoCadena.concat((char)buf[i]);
+            }
+            dato1=DatoCadena.toInt();
+            Serial.print("Dato1 recivido: ");
+            Serial.println(dato1);
+        }
+        
+        else if((char)buf[0]=='i') //verificamos el inicio de trama
+        {
+            for (i = 1; i < buflen; i++)
+            {
+          DatoCadena.concat((char)buf[i]);
+            }
+            dato1=DatoCadena.toInt();
+            Serial.print("Dato1 recivido: ");
+            Serial.println(dato1);
+        }
+    }
+    ////////////////envio de datos/////////////
+    char buf1[VW_MAX_MESSAGE_LEN]; // Cadena para enviar
+    int dato1=valorADC; //variable con el tiempo en segundos
+    String str="";
+    str="i"+String(dato1); //convertimos el entero a String y agramos un inicio de trama
+    str.toCharArray(buf1,sizeof(buf1)); //convertimos el String en un array
+    vw_send((uint8_t *)buf1, strlen(buf1)); //Enviamos el array
+    vw_wait_tx(); //Esperamos hasta que el mensaje se envie
+    str="i"+String(dato1); //convertimos el entero a String y agramos un inicio de trama
+    str.toCharArray(buf1,sizeof(buf1)); //convertimos el String en un array
+    vw_send((uint8_t *)buf1, strlen(buf1)); //Enviamos el array
+    vw_wait_tx(); //Esperamos hasta que el mensaje se envie
+    delay(200);
+    ////////////////////////////////////////////////////////////////
+  //////////////////////////
+  
